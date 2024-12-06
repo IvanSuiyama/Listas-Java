@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import com.autobots.automanager.modelos.DocumentoCadastrar;
-import com.autobots.automanager.modelos.DocumentoSelecionar;
 import com.autobots.automanager.modelos.DocumentoExcluir;
 import com.autobots.automanager.repositorios.ClienteRepositorio;
 import com.autobots.automanager.repositorios.DocumentoRepositorio;
@@ -20,10 +20,10 @@ import com.autobots.automanager.modelos.DocumentoAtualizador;
 
 @RestController
 @RequestMapping("/documento")
-public class DocumentoController {
+public class DocumentoControle {
 
     @Autowired
-    private AdicionarLinkDocumento adicionarLink;
+    private AdicionarLinkDocumento adicionadorLink;
 
     @Autowired
     private DocumentoRepositorio repositorio;
@@ -42,7 +42,7 @@ public class DocumentoController {
 
         } else {
 
-            adicionarLink.adicionarLink(documentos);
+            adicionadorLink.adicionarLink(documentos);
 
             return ResponseEntity.ok(documentos);
 
@@ -55,7 +55,7 @@ public class DocumentoController {
         if (documento == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else {
-            adicionarLink.adicionarLink(List.of(documento));
+            adicionadorLink.adicionarLink(List.of(documento));
             return ResponseEntity.ok(documento);
         }
     }
@@ -73,7 +73,7 @@ public class DocumentoController {
 
             List<Documento> documentos = cliente.getDocumentos();
 
-            adicionarLink.adicionarLink(documentos);
+            adicionadorLink.adicionarLink(documentos);
 
             return ResponseEntity.ok(documentos);
 
