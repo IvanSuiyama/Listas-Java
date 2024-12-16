@@ -2,10 +2,13 @@ package com.autobots.automanager.controles;
 
 import java.util.List;
 
+import com.autobots.automanager.entidades.Cliente;
 import com.autobots.automanager.entidades.Documento;
-import com.autobots.automanager.repositorios.DocumentoRepositorio;
-import com.autobots.automanager.modelo.DocumentoSelecionador;
 import com.autobots.automanager.modelo.DocumentoAtualizador;
+import com.autobots.automanager.modelo.DocumentoCadastrador;
+import com.autobots.automanager.modelo.DocumentoRemovedor;
+import com.autobots.automanager.repositorios.ClienteRepositorio;
+import com.autobots.automanager.modelo.ClienteSelecionador;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,32 +17,43 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/documento")
 public class DocumentoController {
     @Autowired
-    private DocumentoRepositorio repositorio;
+    private ClienteRepositorio repositorio;
     @Autowired
-    private DocumentoSelecionador selecionador;
+    private ClienteSelecionador selecionador;
+    @Autowired
+    private DocumentoCadastrador cadastrador;
+    @Autowired
+    private DocumentoAtualizador atualizador;
+    @Autowired
+    private DocumentoRemovedor removedor;
+
+    @PostMapping("/cadastrar/{id}")
+    public void cadastrarDocumento(@RequestBody List<Documento> documento, @PathVariable long id){
+        List<Cliente> clientes = repositorio.findAll();
+        Cliente cliente = selecionador.selecionar(clientes, id);
+        cadastrador.cadastrar(cliente, documento);
+        repositorio.save(cliente);
+    }
+
     @GetMapping("/documento/{id}")
-    public Documento obterDocumento(@PathVariable long id) {
-        List<Documento> documentos = repositorio.findAll();
-        return selecionador.selecionar(documentos, id);
+    public List<Documento> visualizarDocumento(@PathVariable long id){
+        List<Cliente> clientes = repositorio.findAll();
+        return selecionador.selecionar(clientes, id).getDocumentos();
     }
 
-    @GetMapping("/documentos")
-    public List<Documento> obterDocumentos() {
-        List<Documento> documentos = repositorio.findAll();
-        return documentos;
+    @PutMapping("/atualizar/{id}")
+    public void  atualizarDocumento(@RequestBody List<Documento> documento, @PathVariable long id){
+        List<Cliente> clientes = repositorio.findAll();
+        Cliente cliente = selecionador.selecionar(clientes, id);
+        atualizador.atualizar(cliente.getDocumentos(), documento);
+        repositorio.save(cliente);
     }
 
-    @PutMapping("/atualizar")
-    public void atualizarDocumento(@RequestBody Documento atualizacao) {
-        Documento documento = repositorio.getById(atualizacao.getId());
-        DocumentoAtualizador atualizador = new DocumentoAtualizador();
-        atualizador.atualizar(documento, atualizacao);
-        repositorio.save(documento);
-    }
-
-    @DeleteMapping("/excluir")
-    public void excluirDocumento(@RequestBody Documento exclusao) {
-        Documento documento = repositorio.getById(exclusao.getId());
-        repositorio.delete(documento);
+    @DeleteMapping("/excluir/{id}")
+    public void excluirDocumento(@RequestBody List<Documento> documento, @PathVariable long id){
+        List<Cliente> clientes = repositorio.findAll();
+        Cliente cliente = selecionador.selecionar(clientes, id);
+        removedor.excluir(cliente, documento);
+        repositorio.save(cliente);
     }
 }
